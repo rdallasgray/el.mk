@@ -46,7 +46,7 @@ carton:
 
 rename-package: setup carton version
 	@echo "Renaming tmp/src-pkg.el to tmp/$(PROJECT_LCNAME)-pkg.el"
-	@`mv ${TMP_DIR}/src-pkg.el ${TMP_DIR}/$(PROJECT_LCNAME)-pkg.el`
+	@`mv -f ${TMP_DIR}/src-pkg.el ${TMP_DIR}/$(PROJECT_LCNAME)-pkg.el`
 
 commentary: setup
 	@echo "Inserting commentary"
