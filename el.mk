@@ -29,7 +29,7 @@ clean:
 
 build-clean: build clean
 
-version: setup carton
+version: setup cask
 	@for FILE in ${VERSIONED_FILES}; do \
 	echo "Setting version number ${VERSION} and year ${YEAR} in ${SRC_DIR}/$$FILE"; \
 	sed -e 's/@VERSION/${VERSION}/g' -e 's/@YEAR/${YEAR}/g' ${SRC_DIR}/$$FILE > ${TMP_DIR}/$$FILE; \
