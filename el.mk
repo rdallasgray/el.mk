@@ -12,7 +12,7 @@ TEST_FILE=test/$(PROJECT_LCNAME)-test-main.el
 
 all: build-cleanup
 
-.PHONY : setup clean version carton rename-package commentary test build release
+.PHONY : setup clean version cask rename-package commentary test build release
 
 release: test
 	@echo "Committing"
@@ -25,26 +25,26 @@ setup:
 clean:
 	@`rm -Rf tmp`
 	@`rm lib/commentary`
-	@`rm lib/Carton`	
+	@`rm lib/Cask`
 
 build-cleanup: build
 	@echo "Removing tmp and unused build files"
 	@`rm -Rf tmp`
 	@`rm lib/commentary`
-	@`rm lib/Carton`
+	@`rm lib/Cask`
 
-version: setup carton
+version: setup cask
 	@for FILE in $(VERSIONED_FILES); do \
 	echo "Setting version number ${VERSION} and year ${YEAR} in ${TMP_DIR}/$$FILE"; \
 	sed -i '' -e 's/@VERSION/${VERSION}/g' ${TMP_DIR}/$$FILE; \
 	sed -i '' -e 's/@YEAR/${YEAR}/g' ${TMP_DIR}/$$FILE; \
 	done
 
-carton:
+cask:
 	@echo "Creating pkg file"
-	@`cd src && carton package`
+	@`cd src && cask package`
 
-rename-package: setup carton version
+rename-package: setup cask version
 	@echo "Renaming tmp/src-pkg.el to tmp/$(PROJECT_LCNAME)-pkg.el"
 	@`mv -f ${TMP_DIR}/src-pkg.el ${TMP_DIR}/$(PROJECT_LCNAME)-pkg.el`
 
