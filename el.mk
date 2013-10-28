@@ -19,12 +19,12 @@ release: test
 
 setup:
 	@echo "Creating ${TMP_DIR}"
-	@`mkdir ${TMP_DIR}`
+	@mkdir ${TMP_DIR}
 	@echo "Copying src files to tmp"
-	@`cp ${SRC_FILES} ${TMP_DIR}/`
+	@cp ${SRC_FILES} ${TMP_DIR}/
 
 clean:
-	@`rm -Rf tmp`
+	@rm -Rf tmp
 
 build-clean: build clean
 
@@ -36,7 +36,7 @@ version: setup cask
 
 cask:
 	@echo "Creating pkg file"
-	@`cask package`
+	@cask package
 
 commentary: setup
 	@echo "Inserting commentary"
@@ -46,7 +46,7 @@ commentary: setup
 	@rm ${TMP_DIR}/commentary
 
 test: build-clean
-	@`emacs -batch -l ert -l ${TEST_FILE} -f ert-run-tests-batch-and-exit`
+	@emacs -batch -l ert -l ${TEST_FILE} -f ert-run-tests-batch-and-exit
 
 build: setup cask version commentary
-	@`cp tmp/* lib/`
+	@cp tmp/* lib/
