@@ -4,6 +4,7 @@ SRC_FILES=${shell ls *.el}
 
 TAG=${shell git fetch --tags && git describe --abbrev=0}
 REV=${shell git describe --long | sed -E 's/([^\-]*)\-([0-9]+).*/\2/'}
+REV=${shell git rev-list ${TAG}..HEAD --count --merges}
 VERSION=${TAG}.${REV}
 YEAR=${shell date +"%Y"}
 COMMENTARY_FILE=README.md
@@ -12,10 +13,6 @@ TEST_FILE=test/${PROJECT_LCNAME}-test-main.el
 all: build-clean
 
 .PHONY : setup clean version cask commentary test build release
-
-release: test
-	@echo "Committing"
-	@git add . && git commit -am "${VERSION}"
 
 setup:
 	@echo "Creating ${TMP_DIR}"
