@@ -13,6 +13,9 @@ all: build-clean
 
 .PHONY : setup clean version cask commentary test build release
 
+release: build-clean
+	@git add lib/ && git commit -m ${VERSION} && git push --tags origin master
+
 setup:
 	@echo "Creating ${TMP_DIR}"
 	@mkdir ${TMP_DIR}
@@ -41,7 +44,7 @@ commentary: setup
 	@mv ${TMP_DIR}/${PROJECT_LCNAME}_commented.el ${TMP_DIR}/${PROJECT_LCNAME}.el
 	@rm ${TMP_DIR}/commentary
 
-test: build-clean
+test:
 	@emacs -batch -l ert -l ${TEST_FILE} -f ert-run-tests-batch-and-exit
 
 build: setup cask version commentary
