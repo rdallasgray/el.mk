@@ -1,8 +1,11 @@
 TMP_DIR=tmp
 LIB_DIR=lib
+DIST_DIR=dist
 SRC_FILES=${shell ls *.el} Cask
 
+ifeq (${VERSION},)
 VERSION=${shell git fetch --tags && git describe --abbrev=0}
+endif
 YEAR=${shell date +"%Y"}
 COMMENTARY_FILE=README.md
 TEST_FILE=test/${PROJECT_LCNAME}-test-main.el
@@ -12,6 +15,7 @@ all: build-clean
 .PHONY : tmp clean error version pkg-file commentary build
 
 tmp:
+	@make clean
 	@echo "Creating ${TMP_DIR}"
 	@mkdir ${TMP_DIR}
 	@echo "Copying src files to tmp"
@@ -40,6 +44,10 @@ version: tmp
 pkg-file: version commentary
 	@echo "Creating pkg file"
 	@cask --path ${TMP_DIR} pkg-file
+
+dist: build
+	@echo "Creating tar file"
+	@cask --path ${TMP_DIR} package
 
 commentary: tmp
 	@echo "Inserting commentary"
