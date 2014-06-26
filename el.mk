@@ -1,51 +1,53 @@
-BUILD_DIR=lib
 TMP_DIR=tmp
-SRC_FILES=${shell ls *.el}
+LIB_DIR=lib
+SRC_FILES=${shell ls *.el} Cask
 
-TAG=${shell git fetch --tags && git describe --abbrev=0}
-REV=${shell git rev-list ${TAG}..HEAD --count --merges}
-VERSION=${TAG}.${REV}
+VERSION=${shell git fetch --tags && git describe --abbrev=0}
 YEAR=${shell date +"%Y"}
 COMMENTARY_FILE=README.md
 TEST_FILE=test/${PROJECT_LCNAME}-test-main.el
 
 all: build-clean
 
-.PHONY : setup clean version cask commentary test build release
+.PHONY : tmp clean error version pkg-file commentary build
 
-release: build-clean
-	@git add lib/ && git commit -m ${VERSION} && git push --tags origin master
-
-setup:
+tmp:
 	@echo "Creating ${TMP_DIR}"
 	@mkdir ${TMP_DIR}
 	@echo "Copying src files to tmp"
 	@cp ${SRC_FILES} ${TMP_DIR}/
 
 clean:
+	@echo "Removing tmp"
 	@rm -Rf tmp
+
+clean-lib:
+	@rm ${LIB_DIR}/*
 
 build-clean: build clean
 
-version: setup cask
-	@for FILE in ${SRC_FILES}; do \
+error:
+	@make clean
+	@exit 1
+
+version: tmp
+	@for FILE in ${shell ls ${TMP_DIR}}; do \
 	echo "Setting version number ${VERSION} and year ${YEAR} in $$FILE"; \
-	sed -e 's/@VERSION/${VERSION}/g' -e 's/@YEAR/${YEAR}/g' $$FILE > ${TMP_DIR}/$$FILE; \
+	sed -e 's/@VERSION/${VERSION}/g' -e 's/@YEAR/${YEAR}/g' $$FILE > ${TMP_DIR}/$$FILE.versioned; \
+	mv ${TMP_DIR}/$$FILE.versioned ${TMP_DIR}/$$FILE; \
 	done
 
-cask:
+pkg-file: version commentary
 	@echo "Creating pkg file"
-	@cask package
+	@cask --path ${TMP_DIR} pkg-file
 
-commentary: setup
+commentary: tmp
 	@echo "Inserting commentary"
 	@sed 's/^/;; /' ${COMMENTARY_FILE} > ${TMP_DIR}/commentary
-	@sed -e '/@COMMENTARY/r ${TMP_DIR}/commentary' -e '//d' ${TMP_DIR}/${PROJECT_LCNAME}.el > ${TMP_DIR}/${PROJECT_LCNAME}_commented.el
-	@mv ${TMP_DIR}/${PROJECT_LCNAME}_commented.el ${TMP_DIR}/${PROJECT_LCNAME}.el
+	@sed -e '/@COMMENTARY/r ${TMP_DIR}/commentary' -e '//d' \
+	${TMP_DIR}/${PROJECT_LCNAME}.el > ${TMP_DIR}/${PROJECT_LCNAME}.commented.el
+	@mv ${TMP_DIR}/${PROJECT_LCNAME}.commented.el ${TMP_DIR}/${PROJECT_LCNAME}.el
 	@rm ${TMP_DIR}/commentary
 
-test:
-	@emacs -batch -l ert -l ${TEST_FILE} -f ert-run-tests-batch-and-exit
-
-build: setup cask version commentary
-	@cp tmp/* lib/
+build: pkg-file clean-lib
+	@cp tmp/*.el lib/
