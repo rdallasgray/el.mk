@@ -23,10 +23,10 @@ tmp:
 
 clean:
 	@echo "Removing tmp"
-	@rm -Rf tmp
+	@rm -Rf tmp || true
 
 clean-lib:
-	@rm ${LIB_DIR}/*
+	@rm ${LIB_DIR}/* || true
 
 build-clean: build clean
 
